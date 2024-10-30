@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản Lý Người Dùng và Tổ Chức</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f6f8;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #001529;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .sidebar .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .sidebar .menu-item:hover, .sidebar .menu-item.active {
+            background-color: #1890ff;
+        }
+
+        .sidebar .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar .submenu {
+            padding-left: 30px;
+            display: none;
+        }
+
+        .sidebar .submenu .menu-item {
+            padding: 10px 20px;
+            background-color: #002140;
+        }
+
+        .sidebar .submenu .menu-item:hover, .sidebar .submenu .menu-item.active {
+            background-color: #40a9ff;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            width: calc(100% - 250px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .profile-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .profile-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .profile-details, .profile-edit-form {
+            margin-bottom: 20px;
+        }
+
+        .profile-details p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .btn-save {
+            background-color: #1890ff;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-save:hover {
+            background-color: #40a9ff;
+        }
+
+        .btn-change-password {
+            background-color: #d9d9d9;
+            color: #000;
+            border: none;
+            margin-left: 10px;
+            cursor: not-allowed;
+        }
+
+        .btn-change-password:hover {
+            background-color: #bfbfbf;
+        }
+
+        .btn-logout {
+            background-color: #ff4d4f;
+            color: #fff;
+            border: none;
+            width: 100%;
+        }
+
+        .btn-logout:hover {
+            background-color: #ff7875;
+        }
+
+        /* Linked Account Management */
+        .linked-account-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .linked-account-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .linked-account-tabs .nav-link {
+            color: #555;
+        }
+
+        .linked-account-tabs .nav-link.active {
+            background-color: #1890ff;
+            color: #fff;
+        }
+
+        .badge-red {
+            background-color: #ff4d4f;
+            margin-left: 5px;
+        }
+
+        /* Security Section */
+        .security-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .security-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .security-section .toggle-switch {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* User Management */
+        .user-management-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-management-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .user-management-section .btn-add {
+            background-color: #52c41a;
+            color: #fff;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .user-management-section .btn-add:hover {
+            background-color: #73d13d;
+        }
+
+        .user-management-section .badge-role {
+            background-color: #91d5ff;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Support System */
+        .support-system-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .support-system-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar .menu-item span {
+                display: none;
+            }
+
+            .sidebar .submenu {
+                padding-left: 15px;
+            }
+
+            .main-content {
+                margin-left: 60px;
+                width: calc(100% - 60px);
+            }
+
+            .header .username {
+                display: none;
+            }
+
+            .profile-section, .linked-account-section, .security-section, .user-management-section, .support-system-section {
+                padding: 15px;
+            }
+
+            .btn-save, .btn-change-password, .btn-logout, .btn-add {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .linked-account-tabs .nav-link {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Account Information -->
+        <div class="menu-item active" data-menu="accountInfo">
+            <i class="fas fa-user-circle"></i><span>Account Information</span>
+        </div>
+        <!-- Link Management -->
+        <div class="menu-item" data-menu="linkManagement">
+            <i class="fas fa-link"></i><span>Link Management</span>
+        </div>
+        <!-- Security -->
+        <div class="menu-item" data-menu="security">
+            <i class="fas fa-shield-alt"></i><span>Security</span>
+        </div>
+        <!-- User Management -->
+        <div class="menu-item" data-menu="userManagement">
+            <i class="fas fa-users-cog"></i><span>User Management</span>
+        </div>
+        <div class="submenu" id="userManagementSubmenu">
+            <div class="menu-item" data-menu="staffAccounts">
+                <i class="fas fa-user-tie"></i><span>Staff Accounts</span>
+            </div>
+            <div class="menu-item" data-menu="rolesPermissions">
+                <i class="fas fa-user-tag"></i><span>Roles and Permissions</span>
+            </div>
+        </div>
+        <!-- Support System -->
+        <div class="menu-item" data-menu="supportSystem">
+            <i class="fas fa-life-ring"></i><span>Support System</span>
+        </div>
+        <div class="submenu" id="supportSystemSubmenu">
+            <div class="menu-item" data-menu="documentation">
+                <i class="fas fa-book"></i><span>Documentation</span>
+            </div>
+            <div class="menu-item" data-menu="userGuides">
+                <i class="fas fa-book-reader"></i><span>User Guides</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Account Information Page -->
+        <div id="accountInfo" class="content-page">
+            <!-- Header -->
+            <div class="header">
+                <img src="https://via.placeholder.com/40" alt="Avatar" class="avatar">
+                <span class="username">Nguyễn Văn A</span>
+            </div>
+
+            <!-- Profile Management Section -->
+            <div class="profile-section">
+                <h3>Profile Management</h3>
+                <div class="profile-details">
+                    <p><strong>Name:</strong> Nguyễn Văn A</p>
+                    <p><strong>ID:</strong> 123456789</p>
+                    <p><strong>Verified Phone Number:</strong> 0123456789</p>
+                    <p><strong>Email:</strong> nguyenvana@example.com</p>
+                </div>
+                <div class="profile-edit-form">
+                    <form>
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" value="Nguyễn Văn A">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumber" value="0123456789">
+                        </div>
+                        <div class="mb-3">
+                            <label for="emailAddress" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="emailAddress" value="nguyenvana@example.com">
+                        </div>
+                        <button type="submit" class="btn btn-save">Save Changes</button>
+                        <button type="button" class="btn btn-change-password" disabled>Change Password</button>
+                    </form>
+                </div>
+                <button class="btn btn-logout">Logout</button>
+            </div>
+        </div>
+
+        <!-- Link Management Page -->
+        <div id="linkManagement" class="content-page" style="display: none;">
+            <div class="linked-account-section">
+                <h3>Quản lý liên kết</h3>
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs linked-account-tabs mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Kho vận</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Tài chính <span class="badge bg-danger">2</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Chat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Ads <span class="badge bg-danger">1</span></a>
+                    </li>
+                </ul>
+                <!-- Add Link Button -->
+                <button class="btn btn-primary mb-3 float-end"><i class="fas fa-plus"></i> Thêm liên kết</button>
+                <!-- Linked Accounts Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tài khoản liên kết</th>
+                                <th>Kênh</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sample Data -->
+                            <tr>
+                                <td>1</td>
+                                <td><i class="fab fa-shopify text-primary"></i> shopee@example.com</td>
+                                <td>Shopee</td>
+                                <td><span class="badge bg-success">Đang liên kết</span></td>
+                                <td><button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><i class="fab fa-tiktok text-secondary"></i> tiktok@example.com</td>
+                                <td>TikTok</td>
+                                <td><span class="badge bg-danger">Đã hết hạn</span></td>
+                                <td><button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button></td>
+                            </tr>
+                            <!-- Thêm dữ liệu mẫu nếu cần -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Page -->
+        <div id="security" class="content-page" style="display: none;">
+            <div class="security-section">
+                <h3>Bảo mật và đăng nhập</h3>
+                <!-- Security Section -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-shield-alt me-2"></i>Bảo mật</h5>
+                    <div class="form-check form-switch toggle-switch">
+                        <input class="form-check-input" type="checkbox" id="twoFactorAuth">
+                        <label class="form-check-label" for="twoFactorAuth">Two-Factor Authentication</label>
+                    </div>
+                    <p class="text-muted">Two-factor authentication requires an OTP when logging in from a new device.</p>
+                </div>
+                <!-- Login Management Section -->
+                <div>
+                    <h5><i class="fas fa-sign-in-alt me-2"></i>Quản lý đăng nhập</h5>
+                    <!-- Mobile Device Access List -->
+                    <h6 class="mt-4">Mobile Device Access List</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tài khoản</th>
+                                    <th>Loại thiết bị</th>
+                                    <th>Thời gian</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample Data -->
+                                <tr>
+                                    <td>Nguyễn Văn A</td>
+                                    <td>iOS</td>
+                                    <td>01/04/2024 10:00 AM</td>
+                                    <td><button class="btn btn-danger btn-sm">Xóa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Trần Thị B</td>
+                                    <td>Android</td>
+                                    <td>15/04/2024 02:30 PM</td>
+                                    <td><button class="btn btn-danger btn-sm">Xóa</button></td>
+                                </tr>
+                                <!-- Thêm dữ liệu mẫu nếu cần -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Browser Access List -->
+                    <h6 class="mt-4">Browser Access List</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tài khoản</th>
+                                    <th>Trình duyệt - Thiết bị</th>
+                                    <th>Thời gian</th>
+                                    <th>Địa điểm</th>
+                                    <th>Trạng thái</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample Data -->
+                                <tr>
+                                    <td>nguyenvana@example.com</td>
+                                    <td>Chrome - Windows</td>
+                                    <td>01/04/2024 09:00 AM</td>
+                                    <td>Hà Nội, Việt Nam</td>
+                                    <td><span class="badge bg-success">Đã xác thực</span></td>
+                                    <td><button class="btn btn-danger btn-sm">Xóa</button></td>
+                                </tr>
+                                <tr>
+                                    <td>tranthib@example.com</td>
+                                    <td>Firefox - macOS</td>
+                                    <td>15/04/2024 03:45 PM</td>
+                                    <td>TP. Hồ Chí Minh, Việt Nam</td>
+                                    <td><span class="badge bg-danger">Chưa xác thực</span></td>
+                                    <td><button class="btn btn-danger btn-sm">Xóa</button></td>
+                                </tr>
+                                <!-- Thêm dữ liệu mẫu nếu cần -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management Page -->
+        <div id="userManagement" class="content-page" style="display: none;">
+            <!-- Staff Accounts Submenu -->
+            <div id="staffAccounts" class="content-subpage">
+                <div class="user-management-section">
+                    <h3>Danh sách tài khoản nhân viên</h3>
+                    <!-- Company Information -->
+                    <p><strong>Company ID:</strong> fb5376331565719216</p>
+                    <p><strong>Login Link:</strong> <a href="https://salework.net/login/fb5376331565719216" target="_blank">https://salework.net/login/fb5376331565719216</a></p>
+                    <!-- Add Employee Button -->
+                    <button class="btn btn-add float-end"><i class="fas fa-plus"></i> Thêm nhân viên</button>
+                    <!-- Refresh and Close Buttons -->
+                    <div class="float-end me-2">
+                        <button class="btn btn-light btn-sm me-2"><i class="fas fa-sync"></i></button>
+                        <button class="btn btn-light btn-sm"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="clearfix"></div>
+                    <!-- Employee Account Table -->
+                    <div class="table-responsive mt-3">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Tên đăng nhập</th>
+                                    <th>Tên</th>
+                                    <th>Chức vụ</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Email</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample Data -->
+                                <tr>
+                                    <td><img src="https://via.placeholder.com/40" alt="Avatar" class="avatar"></td>
+                                    <td>staff01</td>
+                                    <td>Nguyễn Văn B</td>
+                                    <td><span class="badge badge-role">ROLE_ADMIN</span></td>
+                                    <td>0987654321</td>
+                                    <td>nguyenvanb@example.com</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm me-2"><i class="fas fa-pencil-alt"></i></button>
+                                        <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><img src="https://via.placeholder.com/40" alt="Avatar" class="avatar"></td>
+                                    <td>staff02</td>
+                                    <td>Trần Thị C</td>
+                                    <td><span class="badge badge-role">ROLE_USER</span></td>
+                                    <td>0123456789</td>
+                                    <td>tranthic@example.com</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm me-2"><i class="fas fa-pencil-alt"></i></button>
+                                        <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <!-- Thêm dữ liệu mẫu nếu cần -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Staff Account Submenu -->
+            <div id="createStaffAccount" class="content-subpage" style="display: none;">
+                <div class="user-management-section">
+                    <h3>Tạo người dùng mới trong công ty, tổ chức [Company Name]</h3>
+                    <!-- Company Information -->
+                    <p><strong>Company ID:</strong> fb5376331565719216</p>
+                    <p><strong>Login Link:</strong> <a href="https://salework.net/login/fb5376331565719216" target="_blank">https://salework.net/login/fb5376331565719216</a></p>
+                    <!-- New User Information Form -->
+                    <form>
+                        <div class="mb-3">
+                            <label for="newUsername" class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="newUsername" placeholder="4-20 ký tự, chữ, số, dấu gạch dưới">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control" id="newPassword">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                            <input type="password" class="form-control" id="confirmPassword">
+                        </div>
+                        <!-- Employee Permission Settings -->
+                        <h5>Phân quyền cho nhân viên</h5>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="EMPLOYEE_ACCOUNT_MANAGE" id="permission1">
+                                <label class="form-check-label" for="permission1">
+                                    Quản lý chung (EMPLOYEE_ACCOUNT_MANAGE)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="ZALO_MANAGE" id="permission2">
+                                <label class="form-check-label" for="permission2">
+                                    Quản lý và thiết lập Salework Zalo (ZALO_MANAGE)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="ZALO_ACCESS" id="permission3">
+                                <label class="form-check-label" for="permission3">
+                                    Truy cập Salework Zalo (ZALO_ACCESS)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="ZALO_CONTACT" id="permission4">
+                                <label class="form-check-label" for="permission4">
+                                    Xem liên hệ và tin nhắn trong Salework Zalo (ZALO_CONTACT)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="CRM_ACCESS" id="permission5">
+                                <label class="form-check-label" for="permission5">
+                                    Truy cập Salework CRM (CRM_ACCESS)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="CRM_MANAGE" id="permission6">
+                                <label class="form-check-label" for="permission6">
+                                    Quản lý và thiết lập Salework CRM (CRM_MANAGE)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="BANKING_MANAGE" id="permission7">
+                                <label class="form-check-label" for="permission7">
+                                    Quản lý Salework Banking (BANKING_MANAGE)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="BANKING_ACCESS" id="permission8">
+                                <label class="form-check-label" for="permission8">
+                                    Truy cập Salework Banking (BANKING_ACCESS)
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Select Existing Role -->
+                        <div class="mb-3">
+                            <label for="existingRole" class="form-label">Hoặc chọn một chức vụ có sẵn</label>
+                            <select class="form-select" id="existingRole">
+                                <option selected>Chọn chức vụ</option>
+                                <option value="ROLE_ADMIN">Quản trị viên</option>
+                                <option value="ROLE_USER">Người dùng</option>
+                                <!-- Thêm các chức vụ khác nếu cần -->
+                            </select>
+                        </div>
+                        <!-- Additional Information -->
+                        <div class="mb-3">
+                            <label for="additionalInfo" class="form-label">Cập nhật thêm thông tin cho tài khoản (không bắt buộc)</label>
+                            <input type="text" class="form-control" id="additionalInfo" placeholder="Thông tin bổ sung">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Tạo người dùng</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Roles and Permissions Submenu -->
+            <div id="rolesPermissions" class="content-subpage" style="display: none;">
+                <div class="user-management-section">
+                    <h3>Roles and Permissions</h3>
+                    <!-- Nội dung quản lý vai trò và quyền hạn -->
+                    <p>Chức năng này đang được phát triển...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support System Page -->
+        <div id="supportSystem" class="content-page" style="display: none;">
+            <div class="support-system-section">
+                <h3>Support System</h3>
+                <!-- Documentation -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-book me-2"></i>Documentation</h5>
+                    <p>Access comprehensive documentation to understand how to use the system effectively.</p>
+                </div>
+                <!-- User Guides -->
+                <div>
+                    <h5><i class="fas fa-book-reader me-2"></i>Provides Guides for End-Users</h5>
+                    <p>Find step-by-step guides to help end-users navigate and utilize the platform efficiently.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies (Popper.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // JavaScript for Interactivity
+
+        // Handle Sidebar Menu Click
+        document.querySelectorAll('.sidebar .menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all menu items
+                document.querySelectorAll('.sidebar .menu-item').forEach(i => i.classList.remove('active'));
+                // Add active class to clicked menu item
+                item.classList.add('active');
+
+                // Hide all content pages
+                document.querySelectorAll('.content-page').forEach(page => page.style.display = 'none');
+                document.querySelectorAll('.content-subpage').forEach(subpage => subpage.style.display = 'none');
+
+                // Get the selected menu
+                const selectedMenu = item.getAttribute('data-menu');
+
+                // Show the corresponding content
+                if(selectedMenu === 'userManagement') {
+                    // By default, show Staff Accounts
+                    document.getElementById('staffAccounts').style.display = 'block';
+                } else {
+                    document.getElementById(selectedMenu).style.display = 'block';
+                }
+
+                // Handle Submenu Click
+                document.querySelectorAll('.submenu .menu-item').forEach(subitem => {
+                    subitem.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent triggering parent menu click
+                        // Remove active class from all submenu items
+                        document.querySelectorAll('.submenu .menu-item').forEach(si => si.classList.remove('active'));
+                        // Add active class to clicked submenu item
+                        subitem.classList.add('active');
+
+                        // Hide all subpages
+                        document.querySelectorAll('.content-subpage').forEach(sp => sp.style.display = 'none');
+
+                        // Show the selected subpage
+                        const selectedSubMenu = subitem.getAttribute('data-menu');
+                        document.getElementById(selectedSubMenu).style.display = 'block';
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
